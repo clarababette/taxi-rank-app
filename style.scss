@@ -1,0 +1,52 @@
+$light: #fffbfd;
+$dark: #2c3540;
+$accent1: #6db43d;
+$accent2: #de4e38;
+$font: 'Roboto', sans-serif;
+$border-radius: 0.5em;
+
+body {
+  background-color: $dark;
+  font-family: $font;
+}
+
+.routes {
+  display: grid;
+  column-gap: 1rem;
+  row-gap: 1rem;
+  grid-auto-flow: column;
+}
+
+.route {
+  width: 10rem;
+  background-color: $light;
+  padding: 1rem;
+  border-radius: $border-radius;
+  text-align: center;
+  min-height: 11rem;
+}
+
+@keyframes arrive {
+  from {
+    transform: translateX(-10rem);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+// .activity {
+//   overflow: hidden;
+//   div {
+//     animation: arrive 3s ease-out;
+//     color: $accent1;
+//   }
+// }
+
+button {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: $accent2;
+}
