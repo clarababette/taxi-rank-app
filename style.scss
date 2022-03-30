@@ -1,13 +1,20 @@
-$light: #fffbfd;
-$dark: #2c3540;
-$accent1: #6db43d;
-$accent2: #de4e38;
+$light: #fdfdfd;
+$dark: #e3e1e7;
+$text: #151a1f;
+$accent1: #1b39fc;
+$accent2: #f4601c;
+$accent3: #2de2b5;
 $font: 'Roboto', sans-serif;
 $border-radius: 0.5em;
+$padding: 0.5em;
+$btn-padding: 0.25em 0.5em;
 
 body {
   background-color: $dark;
   font-family: $font;
+  color: $text;
+  padding: 2rem;
+  pointer-events: none;
 }
 
 .routes {
@@ -18,35 +25,177 @@ body {
 }
 
 .route {
-  width: 10rem;
-  background-color: $light;
-  padding: 1rem;
-  border-radius: $border-radius;
+  width: fit-content;
   text-align: center;
-  min-height: 11rem;
+  filter: drop-shadow(0 0 0.15em darken($color: $light, $amount: 50%));
+  display: grid;
+  row-gap: 0.5rem;
+  column-gap: 0.5rem;
+  grid-template-areas:
+    'destination destination destination'
+    'next-taxi next-taxi people-queue'
+    'taxi-queue wait-time wait-time'
+    'taxi-queue departed-taxis departed-taxis';
+
+  & > div {
+    background-color: $light;
+    padding: 0.5rem;
+    border-radius: $border-radius;
+    display: grid;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    row-gap: 0.5em;
+  }
+
+  .destination {
+    font-size: 1.5rem;
+    height: 2rem;
+    grid-area: destination;
+  }
+  .next-to-depart {
+    grid-area: next-taxi;
+    height: 8rem;
+    width: 10rem;
+  }
+  .people-queue {
+    grid-area: people-queue;
+    height: 8rem;
+    width: 9rem;
+
+    & :first-child {
+      grid-row: 1;
+      grid-column: span 3;
+    }
+    .num-people {
+      font-size: 4rem;
+      min-width: 4.5rem;
+    }
+  }
+
+  .taxi-queue {
+    grid-area: taxi-queue;
+    width: 7.5rem;
+    .num-taxis {
+      font-size: 2rem;
+    }
+  }
+  .wait-time {
+    grid-area: wait-time;
+    & :first-child {
+      font-size: 0.85rem;
+    }
+    .time {
+      font-size: 1.25rem;
+    }
+  }
+  .departed-taxis {
+    grid-area: departed-taxis;
+    & :first-child {
+      font-size: 0.85rem;
+    }
+    .num-departed {
+      font-size: 1.25rem;
+    }
+  }
 }
 
-@keyframes arrive {
+@keyframes arrive-icon {
   from {
     transform: translateX(-10rem);
+    color: $accent1;
   }
 
   to {
     transform: translateX(0);
+    color: $accent3;
   }
 }
 
-// .activity {
-//   overflow: hidden;
-//   div {
-//     animation: arrive 3s ease-out;
-//     color: $accent1;
-//   }
-// }
+@keyframes arrive-text {
+  from {
+    transform: translateX(-10rem);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes depart-icon {
+  from {
+    transform: translateX(0);
+    color: $accent3;
+  }
+
+  to {
+    transform: translateX(10rem);
+    color: $accent1;
+  }
+}
+
+@keyframes depart-text {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(10rem);
+  }
+}
+
+.ready {
+  overflow: hidden;
+  .taxi-icon {
+    font-size: 4rem;
+    animation: arrive-icon 3s ease-out;
+    color: $accent3;
+    padding: 0.1em;
+  }
+  & :first-child,
+  & :nth-child(3) {
+    animation: arrive-text 3s ease-out;
+  }
+}
+
+.departing {
+  overflow: hidden;
+  .taxi-icon {
+    font-size: 4rem;
+    animation: depart-icon 4s ease-out 2s;
+    color: $accent3;
+    padding: 0.1em;
+  }
+  & :first-child,
+  & :nth-child(3) {
+    animation: depart-text 4s ease-out 2s;
+    color: $accent2;
+    font-weight: 700;
+  }
+}
 
 button {
   background: none;
   border: none;
-  font-size: 1rem;
+  font-size: 0.75rem;
+  pointer-events: all;
+}
+
+.people {
+  div {
+    margin-bottom: 0.5em;
+  }
+}
+
+.add_person,
+.remove_person {
   color: $accent2;
+  font-size: 1.5rem;
+}
+
+.add_taxi {
+  font-size: 0.8rem;
+  color: $light;
+  background-color: $accent1;
+  border-radius: $border-radius;
+  padding: $btn-padding;
+  width: fit-content;
+  margin: 0 0.5em;
 }
