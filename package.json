@@ -21,6 +21,7 @@
     "vite": "^2.8.0"
   },
   "dependencies": {
+    "alpinejs": "^3.10.2",
     "handlebars": "^4.7.7",
     "moment": "^2.29.1"
   }

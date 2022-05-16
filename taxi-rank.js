@@ -1,45 +1,76 @@
 import moment from 'moment';
 
-export class Route {
-  constructor(routes) {
-    this._routes = routes;
-  }
-  addPerson() {
-    this._people = [...this._people, new Date()];
-    return this._people.length;
-  }
-  removePerson() {
-    this._people.shift();
-    return this._people.length;
-  }
-  addTaxi() {
-    this._taxis = [...this._taxis, new Date()];
-    return {
-      nextTaxi: this._taxis[0]
-        ? moment(this._taxis[0]).format('LT')
-        : undefined,
-      numTaxisWaiting: this._taxis.length,
-    };
-  }
-  updateQueue() {
-    while (Math.floor(this._people.length / 11) > 0 && this._taxis.length > 0) {
-      this._people.splice(0, 11);
-      this._taxis.shift();
-      this._departed = [...this._departed, moment().toISOString()];
-    }
-    const routeIndex = this._routes.findIndex(
-      (route) => route.destination == this._destination,
-    );
-    this._routes[routeIndex] = {
-      destination: this._destination,
-      people: this._people,
-      taxis: this._taxis,
-      departed: this._departed,
-    };
-  }
+export default  () => ( {
+  
+  routes: [
+  {
+    destination: 'Makhaza',
+    people: [],
+    taxis: [],
+    departed: [],
+  },
+  {
+    destination: 'Belhar',
+    people: [],
+    taxis: [],
+    departed: [],
+  },
+  {
+    destination: 'Bellville',
+    people: [],
+    taxis: [],
+    departed: [],
+  },
+],
+  
+  init() {
+    if (localStorage.getItem('routes')) { this.routes = JSON.parse(localStorage.getItem('routes')) }
+    setInterval(() => this.detailedRoutes,6000)
+    },
+  
+  routeIndex(destination) {
+    return this.routes.findIndex(route => route.destination == destination);
+  },
 
-  avgWaitTime(destination = this._destination) {
-    const queue = this._routes.find(
+  addPerson(destination) {
+    const index = this.routeIndex(destination)
+    this.routes[index].people = [...this.routes[index].people, new Date()]
+  },
+  removePerson(destination) {
+    const index = this.routeIndex(destination)
+    this.routes[index].people.shift()
+  },
+  addTaxi(destination) {
+    const index = this.routeIndex(destination)
+    this.routes[index].taxis = [...this.routes[index].taxis, new Date()]
+  },
+
+  
+
+  updateQueue(index) {
+    let people = this.routes[index].people
+    let taxis = this.routes[index].taxis
+    let departed = this.routes[index].departed
+    
+    while (Math.floor(people.length / 11) > 0 && taxis.length > 0) {
+     
+      this.routes[index].departing = true;
+      const departing = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve();
+        }, 5000);
+      })
+      departing.then(() => {
+        this.routes[index].departing = false;
+      })
+      people.splice(0, 11);
+      taxis.shift();
+      this.routes[index].departed = [...departed, moment().toISOString()];
+    }
+  },
+
+  waitTime(destination) {
+    const queue = this.routes.find(
       (route) => route.destination == destination,
     );
     const milliseconds =
@@ -49,16 +80,22 @@ export class Route {
         );
       }, 0) / queue.people.length;
     return moment.duration(milliseconds, 'milliseconds').humanize();
-  }
+  },
 
-  recentlyDeparted(departed = this._departed) {
+  avgWaitTime(destination) {
+    return this.waitTime(destination);
+  },
+
+  recentlyDeparted(departed) {
     return departed.filter((time) =>
       moment(time).isBetween(moment().subtract(1, 'hours'), moment()),
     );
-  }
+  },
 
   get detailedRoutes() {
-    return this._routes.map((route) => {
+    return this.routes.map((route, index) => {
+      this.updateQueue(index)
+      this.updateStorage()
       return {
         destination: route.destination,
         numPeople: route.people ? route.people.length : 0,
@@ -67,40 +104,18 @@ export class Route {
           : undefined,
         numTaxisWaiting: route.taxis.length,
         avgWaitTime: route.people[0]
-          ? this.avgWaitTime(route.destination)
+          ? this.avgWaitTime(route.destination) 
           : 'There are no passengers waiting at this time.',
         numTaxisDeparted: route.departed
           ? this.recentlyDeparted(route.departed).length
           : 0,
+        departing: route.departing ? route.destination : false,
       };
     });
-  }
+  },
 
-  get routes() {
-    return this._routes;
-  }
-
-  set queue(destination) {
-    const queue = this._routes.find(
-      (route) => route.destination == destination,
-    );
-    this._destination = queue.destination;
-    this._people = queue.people;
-    this._taxis = queue.taxis;
-    this._departed = queue.departed;
-  }
-
-  get queue() {
-    this.updateQueue();
-    return {
-      destination: this._destination,
-      numPeople: this._people.length,
-      nextTaxi: this._taxis[0]
-        ? moment(this._taxis[0]).format('LT')
-        : undefined,
-      numTaxisWaiting: this._taxis.length,
-      avgWaitTime: this.avgWaitTime(),
-      numTaxisDeparted: this._departed ? this.recentlyDeparted().length : 0,
-    };
-  }
+  updateStorage() {
+    localStorage.setItem('routes', JSON.stringify(this.routes));
 }
+  
+})
