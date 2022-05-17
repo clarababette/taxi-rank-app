@@ -1,136 +1,122 @@
 import assert from 'assert';
-import {Route} from '../taxi-rank.js';
+import Route from '../taxi-rank.js';
 import MockDate from 'mockdate';
 
-const taxiRankRoutes = [
-  {
-    destination: 'Makhaza',
-    people: [],
-    taxis: [],
-    departed: [],
-  },
-  {
-    destination: 'Belhar',
-    people: [],
-    taxis: [],
-    departed: [],
-  },
-  {
-    destination: 'Bellville',
-    people: [],
-    taxis: [],
-    departed: [],
-  },
-];
+global.window = {}
+import 'mock-local-storage'
+window.localStorage = global.localStorage
 
-describe('The Taxi Rank Route class', () => {
+describe('The Taxi Rank', () => {
   it('should add a person to a specific queue.', () => {
-    const taxiRank = new Route([...taxiRankRoutes]);
-    taxiRank.queue = 'Bellville';
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    assert.strictEqual(taxiRank.queue.numPeople, 5);
+    const taxiRank = Route();
+    taxiRank.addPerson('Bellville');
+    taxiRank.addPerson('Bellville');
+    taxiRank.addPerson('Bellville');
+    taxiRank.addPerson('Bellville');
+    taxiRank.addPerson('Bellville');
+    const routeIndex = taxiRank.routeIndex('Bellville')
+    assert.strictEqual(taxiRank.detailedRoutes[routeIndex].numPeople, 5);
   });
   it('should remove a person to a specific queue.', () => {
-    const taxiRank = new Route([...taxiRankRoutes]);
-    taxiRank.queue = 'Bellville';
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.removePerson();
-    assert.strictEqual(taxiRank.queue.numPeople, 3);
+   const taxiRank = Route();
+    taxiRank.addPerson('Bellville');
+    taxiRank.addPerson('Bellville');
+    taxiRank.addPerson('Bellville');
+    taxiRank.addPerson('Bellville');
+    taxiRank.removePerson('Bellville');
+    const routeIndex = taxiRank.routeIndex('Bellville')
+    assert.strictEqual(taxiRank.detailedRoutes[routeIndex].numPeople, 3);
   });
   it('should add a taxi to a specific queue.', () => {
-    const taxiRank = new Route([...taxiRankRoutes]);
-    taxiRank.queue = 'Belhar';
-    taxiRank.addTaxi();
-    taxiRank.addTaxi();
-    taxiRank.addTaxi();
-    taxiRank.addTaxi();
-    taxiRank.addTaxi();
-    taxiRank.addTaxi();
-    taxiRank.addTaxi();
-    assert.strictEqual(taxiRank.queue.numTaxisWaiting, 7);
+     const taxiRank = Route();
+    taxiRank.addTaxi('Belhar');
+    taxiRank.addTaxi('Belhar');
+    taxiRank.addTaxi('Belhar');
+    taxiRank.addTaxi('Belhar');
+    taxiRank.addTaxi('Belhar');
+    taxiRank.addTaxi('Belhar');
+    taxiRank.addTaxi('Belhar');
+    const routeIndex = taxiRank.routeIndex('Belhar')
+    assert.strictEqual(taxiRank.detailedRoutes[routeIndex].numTaxisWaiting, 7);
   });
   it('should remove a taxi from the queue once there are enough waiting passengers to fill it.', () => {
-    const taxiRank = new Route([...taxiRankRoutes]);
+     const taxiRank = Route();
     taxiRank.queue = 'Belhar';
-    taxiRank.addTaxi();
-    taxiRank.addTaxi();
-    taxiRank.addTaxi();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    taxiRank.addPerson();
-    assert.strictEqual(taxiRank.queue.numTaxisWaiting, 2);
+    taxiRank.addTaxi('Belhar');
+    taxiRank.addTaxi('Belhar');
+    taxiRank.addTaxi('Belhar');
+    taxiRank.addPerson('Belhar');
+    taxiRank.addPerson('Belhar');
+    taxiRank.addPerson('Belhar');
+    taxiRank.addPerson('Belhar');
+    taxiRank.addPerson('Belhar');
+    taxiRank.addPerson('Belhar');
+    taxiRank.addPerson('Belhar');
+    taxiRank.addPerson('Belhar');
+    taxiRank.addPerson('Belhar');
+    taxiRank.addPerson('Belhar');
+    taxiRank.addPerson('Belhar');
+    taxiRank.addPerson('Belhar');
+    const routeIndex = taxiRank.routeIndex('Belhar')
+    assert.strictEqual(taxiRank.detailedRoutes[routeIndex].numTaxisWaiting, 2);
   });
 
   it('should return the avgerage wait time of the people in the queue.', () => {
-    const taxiRank = new Route([...taxiRankRoutes]);
-    taxiRank.queue = 'Makhaza';
+    const taxiRank = Route();
     MockDate.set('Mar 31 2022 12:08:00 GMT+0200');
-    taxiRank.addPerson();
+    taxiRank.addPerson('Makhaza');
     MockDate.set('Mar 31 2022 12:10:00 GMT+0200');
-    taxiRank.addPerson();
+    taxiRank.addPerson('Makhaza');
     MockDate.set('Mar 31 2022 12:12:00 GMT+0200');
-    taxiRank.addPerson();
+    taxiRank.addPerson('Makhaza');
     MockDate.set('Mar 31 2022 12:18:00 GMT+0200');
-    taxiRank.addPerson();
+    taxiRank.addPerson('Makhaza');
     MockDate.set('Mar 31 2022 12:20:00 GMT+0200');
-    taxiRank.addPerson();
+    taxiRank.addPerson('Makhaza');
     MockDate.set('Mar 31 2022 12:24:00 GMT+0200');
-    taxiRank.addPerson();
+    taxiRank.addPerson('Makhaza');
     MockDate.set('Mar 31 2022 12:30:00 GMT+0200');
-    assert.strictEqual(taxiRank.queue.avgWaitTime, '15 minutes');
+    const routeIndex = taxiRank.routeIndex('Makhaza')
+    assert.strictEqual(taxiRank.detailedRoutes[routeIndex].avgWaitTime, '15 minutes');
   });
   it('should return the number of taxis that have departed in the last hour.', () => {
-    const taxiRank = new Route([...taxiRankRoutes]);
-    taxiRank.queue = 'Makhaza';
+     const taxiRank = Route();
     MockDate.set('Mar 31 2022 12:30:00 GMT+0200');
     for (let i = 0; i < 12; i++) {
-      taxiRank.addPerson();
+      taxiRank.addPerson('Makhaza');
     }
+    taxiRank.detailedRoutes
     MockDate.set('Mar 31 2022 12:35:00 GMT+0200');
-    taxiRank.addTaxi();
-    taxiRank.queue;
+    taxiRank.addTaxi('Makhaza');
     for (let i = 0; i < 12; i++) {
-      taxiRank.addPerson();
+      taxiRank.addPerson('Makhaza');
     }
+     taxiRank.detailedRoutes
     MockDate.set('Mar 31 2022 12:46:00 GMT+0200');
-    taxiRank.addTaxi();
-    taxiRank.queue;
+    taxiRank.addTaxi('Makhaza');
     for (let i = 0; i < 12; i++) {
-      taxiRank.addPerson();
+      taxiRank.addPerson('Makhaza');
     }
+     taxiRank.detailedRoutes
     MockDate.set('Mar 31 2022 12:55:00 GMT+0200');
-    taxiRank.addTaxi();
-    taxiRank.queue;
+    taxiRank.addTaxi('Makhaza');
     for (let i = 0; i < 12; i++) {
-      taxiRank.addPerson();
+      taxiRank.addPerson('Makhaza');
     }
+     taxiRank.detailedRoutes
     MockDate.set('Mar 31 2022 13:25:00 GMT+0200');
-    taxiRank.addTaxi();
-    taxiRank.queue;
+    taxiRank.addTaxi('Makhaza');
     for (let i = 0; i < 12; i++) {
-      taxiRank.addPerson();
+      taxiRank.addPerson('Makhaza');
     }
+     taxiRank.detailedRoutes
     MockDate.set('Mar 31 2022 13:35:00 GMT+0200');
-    taxiRank.addTaxi();
-    taxiRank.queue;
+    taxiRank.addTaxi('Makhaza');
+    taxiRank.detailedRoutes
     MockDate.set('Mar 31 2022 13:45:00 GMT+0200');
-    assert.strictEqual(taxiRank.queue.numTaxisDeparted, 4);
+
+    const routeIndex = taxiRank.routeIndex('Makhaza')
+    assert.strictEqual(taxiRank.detailedRoutes[routeIndex].numTaxisDeparted, 4);
   });
 });
 MockDate.reset();
